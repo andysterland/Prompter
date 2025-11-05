@@ -1,8 +1,0 @@
-{
-  "profiles": {
-    "Prompter": {
-      "commandName": "Project",
-      "commandLineArgs": "--prompt \"Q:\\src\\Prompter\\TestCases\\BestPractice-001.prompt\"\r\n--diffs \"Q:\\src\\Prompter\\TestCases\\Diffs\"\r\n--output-dir \"Q:\\src\\Prompter\\TestCases\\Out\""
-    }
-  }
-}
