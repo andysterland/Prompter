@@ -18,13 +18,13 @@ A console application that executes prompt templates against code diffs using Op
 ## Installation
 
 1. Clone the repository:
-```powershell
+```bash
 git clone https://github.com/andysterland/Prompter
 cd Prompter
 ```
 
 2. Build the project:
-```powershell
+```bash
 dotnet build
 ```
 
@@ -49,8 +49,8 @@ export PROMPTER_OPENAI_KEY="your-api-key-here"
 
 ### Basic Command Structure
 
-```powershell
-prompter --prompt <path-to-prompt-file> --diffs <path-to-diffs-folder> [OPTIONS]
+```bash
+dotnet run --project Prompter -- --prompt <path-to-prompt-file> --diffs <path-to-diffs-folder> [OPTIONS]
 ```
 
 ### Required Options
@@ -66,23 +66,23 @@ prompter --prompt <path-to-prompt-file> --diffs <path-to-diffs-folder> [OPTIONS]
 ### Example Commands
 
 **Basic usage with defaults:**
-```powershell
-prompter -- --prompt prompts/review.txt --diffs ./diffs
+```bash
+dotnet run --project Prompter -- --prompt prompts/review.txt --diffs ./diffs
 ```
 
 **Specify a custom model:**
-```powershell
-prompter -- --prompt prompts/review.txt --diffs ./diffs --modelId gpt-4
+```bash
+dotnet run --project Prompter -- --prompt prompts/review.txt --diffs ./diffs --modelId gpt-4
 ```
 
 **Custom output directory:**
-```powershell
-prompter -- --prompt prompts/review.txt --diffs ./diffs --output-dir ./results
+```bash
+dotnet run --project Prompter -- --prompt prompts/review.txt --diffs ./diffs --output-dir ./results
 ```
 
 **Full example:**
-```powershell
-prompter -- --prompt prompts/summarize.txt --diffs ./code-changes --modelId gpt-4-turbo --output-dir ./analysis-results
+```bash
+dotnet run --project Prompter -- --prompt prompts/summarize.txt --diffs ./code-changes --modelId gpt-4-turbo --output-dir ./analysis-results
 ```
 
 ## Prompt Template Format
@@ -109,7 +109,7 @@ Provide a summary of:
 
 The application expects standard unified diff format (.diff files). You can generate these using Git:
 
-```powershell
+```bash
 # Generate a diff for staged changes
 git diff --cached > changes.diff
 
@@ -147,23 +147,23 @@ Result-{PromptFileName}-{DiffFileName}.json
 ## Example Workflow
 
 1. **Create a prompt template:**
-```powershell
+```bash
 echo "Summarize the changes in the following code:\n\nOLD:\n{{oldCode}}\n\nNEW:\n{{newCode}}" > prompts/summarize.txt
 ```
 
 2. **Generate diffs from your Git repository:**
-```powershell
+```bash
 mkdir diffs
 git diff HEAD~1 HEAD > diffs/recent-changes.diff
 ```
 
 3. **Run Prompter:**
-```powershell
+```bash
 dotnet run --project Prompter -- --prompt prompts/summarize.txt --diffs ./diffs
 ```
 
 4. **Review the results:**
-```powershell
+```bash
 cat out/Result-summarize-File-0-recent-changes.diff.json
 ```
 
