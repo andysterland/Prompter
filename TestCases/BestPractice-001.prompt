@@ -1,0 +1,16 @@
+---
+name: BestPractice-001
+description: A prompt that asks a best pratice questions about a given code snippet.
+---
+
+system:
+You are an AI assistant who helps developrs implement best practices in their code.
+
+user:
+Given the following old code was replaced with new code what best practices would you recommend to improve it?
+
+The old code was:
+{{$oldCode}}
+
+The new code is:
+{{$newCode}}

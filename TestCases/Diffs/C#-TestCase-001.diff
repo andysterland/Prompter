@@ -1,0 +1,138 @@
+diff --git a/WhatsNewWebsite.ApiService/SummaryApi.cs b/WhatsNewWebsite.ApiService/SummaryApi.cs
+index 903b6f9..fafb88a 100644
+--- a/WhatsNewWebsite.ApiService/SummaryApi.cs
++++ b/WhatsNewWebsite.ApiService/SummaryApi.cs
+@@ -61,20 +61,5 @@ namespace WhatsNewWebsite.ApiService
+             }
+             return results;
+         }
+-
+-        // return items with the specified version
+-        public List<WhatsNewItemSummary>GetWithVersion(string Version)
+-
+-        {
+-            var results = new List<WhatsNewItemSummary>();
+-            foreach (var item in _itemSummaries.Values)
+-            {
+-                if (item.Version == Version)
+-                {
+-                    results.Add(item);
+-                }
+-            }
+-            return results;
+-        }
+     }
+ }
+diff --git a/WhatsNewWebsite.DataModel/WhatsNewItemSummary.cs b/WhatsNewWebsite.DataModel/WhatsNewItemSummary.cs
+index ecf32a7..4e26378 100644
+--- a/WhatsNewWebsite.DataModel/WhatsNewItemSummary.cs
++++ b/WhatsNewWebsite.DataModel/WhatsNewItemSummary.cs
+@@ -6,7 +6,6 @@
+         public string Description { get; set; }
+         public string ImageBase64 { get; set; }
+         public int MinorRelease { get; set; }
+-        public string Version { get; set; }
+         public string FileName { get; set; }
+         public string Id { get; set; }
+ 
+@@ -20,16 +19,10 @@
+             this.Description = Description;
+             this.ImageBase64 = ImageBase64;
+             this.MinorRelease = MinorRelease;
+-            this.Version =  GetMinorRelease(MinorRelease);
+             this.FileName = FileName;
+             this.Id = GetId(FileName);
+         }
+ 
+-        private string GetMinorRelease(int MinorRelease)
+-        {
+-            return $"17.{MinorRelease}";
+-        }
+-
+         private string GetId(string FileName)
+         {
+             var lower = FileName.ToLower();
+diff --git a/WhatsNewWebsite.Web/Components/Components/SummaryCard.razor b/WhatsNewWebsite.Web/Components/Components/SummaryCard.razor
+index c4fc3e1..3b3a74d 100644
+--- a/WhatsNewWebsite.Web/Components/Components/SummaryCard.razor
++++ b/WhatsNewWebsite.Web/Components/Components/SummaryCard.razor
+@@ -10,9 +10,6 @@
+               <div class="bg-dark me-md-3 pt-3 px-3 pt-md-5 px-md-5 text-center text-white overflow-hidden card-inner-container"  >
+                 <div class="shadow-sm mx-auto" style="max-height: 200px;" >
+                     <img style="height: 220px;" src="@ItemSummary.ImageBase64" alt="Screenshot of @ItemSummary.Title">
+-                    <div class="btn btn-secondary btn-sm m-2 bottom-0 end-0 version-btn">
+-                        <span>@ItemSummary.Version</span>+
+-                    </div>
+                 </div>
+                 <div class="my-3" style="background-color: #000 !important; margin-bottom: 0 !important;">
+                   <h6 class="card-title text-light bg-dark p-2 w-100 card-caption">@ItemSummary.Title</h6>
+diff --git a/WhatsNewWebsite.Web/Components/Pages/Home.razor b/WhatsNewWebsite.Web/Components/Pages/Home.razor
+index 8dd7841..e7bcebc 100644
+--- a/WhatsNewWebsite.Web/Components/Pages/Home.razor
++++ b/WhatsNewWebsite.Web/Components/Pages/Home.razor
+@@ -21,17 +21,6 @@
+                     <span class="fa fa-search form-control-feedback"></span>
+                     <input type="text" value=@SearchText @oninput=@(e => SearchText_OnChange(e)) class="form-control w-100 search-box" placeholder="Search"></input>
+                 </div>
+-
+-                <div class="form-group has-search filter-box">
+-                    <span class="fa fa-search form-control-feedback"></span>
+-                    <select @onchange="FilterByVersion" class="form-control">
+-                        <option value="">All Version</option>
+-                        @foreach (var version in versions)
+-                        {
+-                            <option value="@version">Visual Studio @version</option>
+-                        }
+-                    </select>
+-                </div>
+             </div>
+         </div>
+ 
+@@ -109,7 +98,6 @@
+     public string SearchText = "";
+ 
+     private System.Timers.Timer _timer = new System.Timers.Timer(300);
+-    private List<string> versions = new List<string> {"17.4", "17.5", "17.6", "17.7", "17.8", "17.9", "17.10", "17.11", "17.12" };
+ 
+     protected override async Task OnInitializedAsync()
+     {
+@@ -171,22 +159,6 @@
+         }
+     }
+ 
+-    private async Task FilterByVersion(ChangeEventArgs e)
+-    {
+-        if (e != null && e.Value != null)
+-        {
+-            var version = e.Value.ToString();
+-            if (string.IsNullOrEmpty(version))
+-            {
+-                ItemSummaries = await _whatsNewApiClient.GetAllSummaries();
+-            }
+-            else
+-            {
+-                ItemSummaries = await _whatsNewApiClient.GetWithVersion(version);
+-            }
+-        }
+-    }
+-
+     private async void TimerElapsed_TickAsync(object sender, EventArgs e)
+     {
+         _timer.Enabled = false;
+diff --git a/WhatsNewWebsite.Web/WhatsNewApiClient.cs b/WhatsNewWebsite.Web/WhatsNewApiClient.cs
+index a86e2d2..4a48975 100644
+--- a/WhatsNewWebsite.Web/WhatsNewApiClient.cs
++++ b/WhatsNewWebsite.Web/WhatsNewApiClient.cs
+@@ -39,12 +39,6 @@ namespace WhatsNewWebsite.Web
+             return itemSummaries ?? new List<WhatsNewItemSummary>(); ;
+         }
+ 
+-
+-        public async Task<List<WhatsNewItemSummary>> GetWithVersion(string Version)
+-        {
+-            return await httpClient.GetFromJsonAsync<List<WhatsNewItemSummary>>($"whatsnewitem/version/{Version}");
+-        }
+-
+         public async Task<WhatsNewItemArticle> GetArticle(string Id)
+         {
+             return await httpClient.GetFromJsonAsync<WhatsNewItemArticle>($"article/{Id}");
